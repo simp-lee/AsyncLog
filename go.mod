@@ -1,4 +1,4 @@
-module asynclog
+module github.com/simp-lee/asynclog
 
 go 1.21.5
 
