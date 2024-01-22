@@ -30,10 +30,11 @@ package main
 
 import (
     "github.com/simp-lee/asynclog"
+    "time"
 )
 
 func main() {
-    // Create a new logger with a buffer size of 100
+    // Create a new logger
     logger, err := asynclog.NewLogger(100)
     if err != nil {
         panic(err)
@@ -48,6 +49,9 @@ func main() {
     logger.Error("Encountered an error")
     // Use Fatal sparingly - high severity
     logger.Fatal("Fatal error occurred")
+	
+    // Wait for a moment to ensure all messages are processed
+    time.Sleep(1 * time.Second)
 }
 ```
 

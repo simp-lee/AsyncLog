@@ -2,7 +2,6 @@ package asynclog
 
 import (
 	"fmt"
-	"log"
 	"os"
 	"path/filepath"
 	"sync"
@@ -20,20 +19,23 @@ const (
 	LogLevelError
 	LogLevelFatal
 
-	// 默认日志文件名称
+	// DefaultBufferSize is the default size of the log message channel.
+	DefaultBufferSize = 100
+
+	// DefaultFileName is the default name for log files.
 	DefaultFileName = "default.log"
 
-	// DefaultMaxFileHandles 默认最大的文件句柄数量
+	// DefaultMaxFileHandles is the default maximum number of file handles.
 	DefaultMaxFileHandles = 10
 
-	// DefaultUnusedFileHandleThreshold 清理阈值
+	// DefaultUnusedFileHandleThreshold is the threshold for cleaning up unused file handles.
 	DefaultUnusedFileHandleThreshold = 30 * time.Minute
 
-	// DefaultCleanupTicker 定时清理任务的时间间隔
+	// DefaultCleanupTicker is the interval for the cleanup routine.
 	DefaultCleanupTicker = 10 * time.Minute
 )
 
-// ParamFormatter is a type for a function that formats log parameters.
+// ParamFormatter is a function type for formatting log parameters.
 type ParamFormatter func(map[string]interface{}) string
 
 // Logger represents an asynchronous logger.
@@ -44,7 +46,7 @@ type Logger struct {
 	DefaultFileName string               // Default log file name.
 	OutputToFile    bool                 // Flag to enable or disable file output.
 	OutputToConsole bool                 // Flag to enable or disable console output.
-	paramFormatter  ParamFormatter       // paramFormatter is the function used to format log parameters.
+	paramFormatter  ParamFormatter       // Function used to format log parameters.
 	fileHandles     map[string]*os.File  // File handles for each log file.
 	fileAccessTimes map[string]time.Time // Last access time for each file handle.
 	fileMutex       sync.Mutex           // Mutex for synchronizing file access.
@@ -60,17 +62,17 @@ type LoggerOption func(*Logger) error
 // opts are functional options to configure the Logger.
 func NewLogger(bufferSize int, opts ...LoggerOption) (*Logger, error) {
 	logger := &Logger{
-		LogChannel:      make(chan LogMessage, bufferSize),
-		FileLevel:       LogLevelInfo,           // Default file level
-		ConsoleLevel:    LogLevelDebug,          // Default console level
-		DefaultFileName: DefaultFileName,        // Default file name
-		OutputToFile:    true,                   // Default output to file
-		OutputToConsole: true,                   // Default output to console
-		paramFormatter:  FormatParamsAsKeyValue, // 默认参数格式化为KeyValue格式
+		LogChannel:      make(chan LogMessage, DefaultBufferSize), // Default size of the log message channel
+		FileLevel:       LogLevelInfo,                             // Default file logging level.
+		ConsoleLevel:    LogLevelDebug,                            // Default console logging level.
+		DefaultFileName: DefaultFileName,                          // Default file name for logging.
+		OutputToFile:    true,                                     // Enable logging to file by default.
+		OutputToConsole: true,                                     // Enable logging to console by default.
+		paramFormatter:  FormatParamsAsKeyValue,                   // Default parameter formatter set to KeyValue.
 		fileHandles:     make(map[string]*os.File),
 		fileAccessTimes: make(map[string]time.Time),
 		maxFileHandles:  DefaultMaxFileHandles,
-		AddSource:       false, // Default not to show source file info
+		AddSource:       false, // Source file info is disabled by default.
 	}
 
 	// Apply each configuration option to the logger
@@ -80,9 +82,8 @@ func NewLogger(bufferSize int, opts ...LoggerOption) (*Logger, error) {
 		}
 	}
 
-	// 启动定时清理任务
+	// Start the cleanup ticker routine.
 	go func() {
-		// 每隔一定时间清理一次
 		cleanupTicker := time.NewTicker(DefaultCleanupTicker)
 		for {
 			select {
@@ -96,6 +97,17 @@ func NewLogger(bufferSize int, opts ...LoggerOption) (*Logger, error) {
 	go logger.processLogs()
 
 	return logger, nil
+}
+
+// SetBufferSize sets the size of the log message channel.
+func SetBufferSize(size int) LoggerOption {
+	return func(l *Logger) error {
+		if size <= 0 {
+			return fmt.Errorf("bufferSize must be positive")
+		}
+		l.LogChannel = make(chan LogMessage, size)
+		return nil
+	}
 }
 
 // SetFileLevel sets the file log level.
@@ -171,7 +183,7 @@ func (l *Logger) Close() {
 
 	for _, file := range l.fileHandles {
 		if err := file.Close(); err != nil {
-			log.Printf("Failed to close log file: %v", err)
+			fmt.Printf("Failed to close log file: %v", err)
 		}
 	}
 }

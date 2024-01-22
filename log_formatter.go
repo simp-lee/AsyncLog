@@ -45,7 +45,7 @@ func formatParamsWithColor(params string) string {
 	return color.New(color.Faint).SprintfFunc()(params)
 }
 
-// 返回代表日志级别的字符串
+// String returns a string representation of the log level.
 func (level LogLevel) String() string {
 	switch level {
 	case LogLevelTrace:
