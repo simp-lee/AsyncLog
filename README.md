@@ -30,6 +30,7 @@ package main
 
 import (
     "github.com/simp-lee/asynclog"
+    "time"
 )
 
 func main() {
@@ -48,6 +49,9 @@ func main() {
     logger.Error("Encountered an error")
     // Use Fatal sparingly - high severity
     logger.Fatal("Fatal error occurred")
+	
+    // Wait for a moment to ensure all messages are processed
+    time.Sleep(1 * time.Second)
 }
 ```
 
