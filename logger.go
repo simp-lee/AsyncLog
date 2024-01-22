@@ -58,9 +58,8 @@ type Logger struct {
 type LoggerOption func(*Logger) error
 
 // NewLogger creates a new Logger with specified options.
-// bufferSize determines the size of the log message channel.
 // opts are functional options to configure the Logger.
-func NewLogger(bufferSize int, opts ...LoggerOption) (*Logger, error) {
+func NewLogger(opts ...LoggerOption) (*Logger, error) {
 	logger := &Logger{
 		LogChannel:      make(chan LogMessage, DefaultBufferSize), // Default size of the log message channel
 		FileLevel:       LogLevelInfo,                             // Default file logging level.
@@ -69,10 +68,10 @@ func NewLogger(bufferSize int, opts ...LoggerOption) (*Logger, error) {
 		OutputToFile:    true,                                     // Enable logging to file by default.
 		OutputToConsole: true,                                     // Enable logging to console by default.
 		paramFormatter:  FormatParamsAsKeyValue,                   // Default parameter formatter set to KeyValue.
+		AddSource:       false,                                    // Source file info is disabled by default.
 		fileHandles:     make(map[string]*os.File),
 		fileAccessTimes: make(map[string]time.Time),
 		maxFileHandles:  DefaultMaxFileHandles,
-		AddSource:       false, // Source file info is disabled by default.
 	}
 
 	// Apply each configuration option to the logger

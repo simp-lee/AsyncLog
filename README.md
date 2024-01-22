@@ -35,7 +35,7 @@ import (
 
 func main() {
     // Create a new logger
-    logger, err := asynclog.NewLogger(100)
+    logger, err := asynclog.NewLogger()
     if err != nil {
         panic(err)
     }
@@ -61,7 +61,7 @@ Customize the logger at instantiation with various options:
 
 ```go
 logger, err := asynclog.NewLogger(
-    100,                                                     // Buffer size
+    asynclog.SetBufferSize(200),                             // Custom buffer size
     asynclog.SetFileLevel(asynclog.LogLevelInfo),            // Set file logging level
     asynclog.SetConsoleLevel(asynclog.LogLevelDebug),        // Set console logging level
     asynclog.EnableSourceInfo(true),                         // Enable source file information recording
