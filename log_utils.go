@@ -7,7 +7,7 @@ import (
 
 // getCallerInfo retrieves the filename and line number of the log caller.
 func getCallerInfo() (string, int) {
-	_, file, line, ok := runtime.Caller(2) // Adjust the stack frame to get the correct caller
+	_, file, line, ok := runtime.Caller(3) // Adjust the stack frame to get the correct caller
 	if !ok {
 		return "unknown", 0
 	}
