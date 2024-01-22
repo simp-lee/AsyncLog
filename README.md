@@ -53,7 +53,7 @@ func main() {
 
 ## Configuration
 
-Customize the logger at instantiation:
+Customize the logger at instantiation with various options:
 
 ```go
 logger, err := asynclog.NewLogger(
@@ -64,22 +64,23 @@ logger, err := asynclog.NewLogger(
     asynclog.SetDefaultFileName("app.log"),                  // Set default log file name
     asynclog.EnableFileOutput(false),                        // Disable file output
     asynclog.EnableConsoleOutput(true),                      // Enable console output
-    asynclog.SetParamFormatter(asynclog.FormatParamsAsJSON), // Set parameter formatting style
+    asynclog.SetParamFormatter(asynclog.FormatParamsAsJSON), // Log parameter formatting
+    asynclog.SetMaxFileHandles(20),                          // Set maximum number of file handles
 )
 ```
 
-## Adding Parameters to Logs
+## Parameters and Formatting
 
-Include additional parameters in your log messages:
+Include additional parameters in your log messages and customize their formatting style:
 
 ```go
 params := map[string]interface{}{
     "user_id": 123,
     "action": "login",
 }
-logger.Info("User action", asynclog.SetLogParams(params))
+logger.Info("User action", asynclog.SetLogParams(params)) // Log with additional parameters
 ```
 
 ## Contributing
 
-Contributions to `AsyncLog` are welcome! Feel free to open issues or submit pull requests for improvements or new features.
+Your contributions to `AsyncLog` are welcome! Feel free to open issues or submit pull requests for improvements or new features.

@@ -80,6 +80,18 @@ func NewLogger(bufferSize int, opts ...LoggerOption) (*Logger, error) {
 		}
 	}
 
+	// 启动定时清理任务
+	go func() {
+		// 每隔一定时间清理一次
+		cleanupTicker := time.NewTicker(DefaultCleanupTicker)
+		for {
+			select {
+			case <-cleanupTicker.C:
+				logger.cleanupUnusedFileHandles()
+			}
+		}
+	}()
+
 	// Start the log processing goroutine
 	go logger.processLogs()
 
@@ -110,7 +122,49 @@ func EnableSourceInfo(enable bool) LoggerOption {
 	}
 }
 
-// Close 关闭文件
+// SetDefaultFileName sets the default log file name.
+func SetDefaultFileName(fileName string) LoggerOption {
+	return func(l *Logger) error {
+		l.DefaultFileName = fileName
+		return nil
+	}
+}
+
+// EnableFileOutput enables or disables file output.
+func EnableFileOutput(enable bool) LoggerOption {
+	return func(l *Logger) error {
+		l.OutputToFile = enable
+		return nil
+	}
+}
+
+// EnableConsoleOutput enables or disables console output.
+func EnableConsoleOutput(enable bool) LoggerOption {
+	return func(l *Logger) error {
+		l.OutputToConsole = enable
+		return nil
+	}
+}
+
+// SetParamFormatter sets the parameter formatting strategy for the logger.
+func SetParamFormatter(formatter ParamFormatter) LoggerOption {
+	return func(l *Logger) error {
+		l.paramFormatter = formatter
+		return nil
+	}
+}
+
+// SetMaxFileHandles sets the maximum number of file handles.
+func SetMaxFileHandles(maxHandles int) LoggerOption {
+	return func(l *Logger) error {
+		if maxHandles <= 0 {
+			return fmt.Errorf("maxFileHandles must be positive")
+		}
+		l.maxFileHandles = maxHandles
+		return nil
+	}
+}
+
 func (l *Logger) Close() {
 	l.fileMutex.Lock()
 	defer l.fileMutex.Unlock()
