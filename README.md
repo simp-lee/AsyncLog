@@ -1,5 +1,11 @@
 # AsyncLog: An Asynchronous Logging Package for Go
 
+**Status: Deprecated**
+
+This package was initially created as a personal learning project to explore Go's logging capabilities. It has served its purpose in providing hands-on experience with logging in Go. However, it is now deprecated and should not be used in production environments.
+
+For production-grade logging solutions, it is highly recommended to use the official Go `slog` package along with the third-party package `github.com/lmittmann/tint`. Package `tint` implements a zero-dependency `slog.Handler` that writes tinted (colorized) logs. Its output format is inspired by the `zerolog.ConsoleWriter` and `slog.TextHandler`.
+
 `AsyncLog` is a versatile and efficient asynchronous logging library for Go, designed for multi-level logging with support for custom formatting, colored output, and file logging capabilities.
 
 ## Features
